@@ -26,11 +26,14 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
+Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/marketplaces', [MarketplaceController::class, 'index']);
-    Route::get('/marketplaces/{id}', [MarketplaceController::class, 'show']);
+    Route::get('/marketplace_detail/{id}', [MarketplaceController::class, 'show']);
     Route::post('/marketplaces', [MarketplaceController::class, 'store']);
     Route::get('/orders', [WarehouseOrderController::class, 'index']);
     Route::get('/orders/{invoice?}', [WarehouseOrderController::class, 'show'])->where('invoice', '[\w\s\-_\/]+');
+    Route::get('/order_detail/{id}', [WarehouseOrderController::class, 'useId']);
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/product_detail/{id}', [ProductController::class, 'show']);
+    Route::get('/products/{name?}', [ProductController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 });

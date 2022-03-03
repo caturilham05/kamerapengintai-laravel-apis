@@ -28,6 +28,7 @@ class ProductController extends Controller
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
+
         $result = [
             'status' => 'success',
             'message' => 'Product retrieved successfully.',
@@ -66,7 +67,39 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        if (empty($id))
+        {
+            $result = [
+                'status' => 'error',
+                'message' => 'Product ID is required.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $product = Product::select()
+            ->where('id', $id)
+            ->get();
+
+        $count = $product->count();
+
+        if ($count == 0) {
+            $result = [
+                'status' => 'error',
+                'message' => 'Product not found.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $result = [
+            'status' => 'success',
+            'message' => 'Product retrieved successfully.',
+            'count' => $count,
+            'result' => $product,
+        ];
+
+        return response()->json($result, Response::HTTP_OK);
     }
 
     /**
@@ -101,5 +134,42 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function useParams($params)
+    {
+        if (empty($params))
+        {
+            $result = [
+                'status' => 'error',
+                'message' => 'params is required.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $product = Product::select()
+            ->where('name', 'LIKE', '%' . $params . '%')
+            ->get();
+
+        $count = $product->count();
+
+        if ($count == 0) {
+            $result = [
+                'status' => 'error',
+                'message' => sprintf('Product not found with name: %s', $params),
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $result = [
+            'status' => 'success',
+            'message' => sprintf('Product retrieved successfully with name: %s', $params),
+            'count' => $count,
+            'result' => $product,
+        ];
+
+        return response()->json($result, Response::HTTP_OK);
     }
 }
