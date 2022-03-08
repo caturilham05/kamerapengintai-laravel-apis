@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\WarehouseOrderProduct;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductController extends Controller
+class WarehouseOrderProductController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $product = Product::paginate(request()->all());
-        $count = Product::count();
+        $datas = WarehouseOrderProduct::paginate(15);
+        $count = WarehouseOrderProduct::count();
         if ($count == 0) {
             $result = [
                 'status' => 'error',
@@ -27,8 +27,8 @@ class ProductController extends Controller
         }
         $result = [
             'status' => 'success',
-            'message' => 'Product retrieved successfully.',
-            'result' => $product,
+            'message' => 'Data retrieved successfully.',
+            'result' => $datas,
         ];
         return response()->json($result, Response::HTTP_OK);
     }
@@ -57,53 +57,47 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\WarehouseOrderProduct  $warehouseOrderProduct
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
+        var_dump($id);die();
         if (empty($id))
         {
             $result = [
                 'status' => 'error',
-                'message' => 'Product ID is required.',
+                'message' => 'data not found',
                 'result' => [],
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
 
-        $product = Product::select()
-            ->where('id', $id)
-            ->get();
-
-        $count = $product->count();
-
-        if ($count == 0) {
+        $data = WarehouseOrderProduct::find($id);
+        $count = WarehouseOrderProduct::count();
+        if (empty($data)) {
             $result = [
                 'status' => 'error',
-                'message' => 'Product not found.',
+                'message' => 'No data found.',
                 'result' => [],
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
-
         $result = [
             'status' => 'success',
-            'message' => 'Product retrieved successfully.',
-            'count' => $count,
-            'result' => $product,
+            'message' => sprintf('%s retrieved successfully.', $data->invoice),
+            'result' => $data,
         ];
-
         return response()->json($result, Response::HTTP_OK);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\WarehouseOrderProduct  $warehouseOrderProduct
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(WarehouseOrderProduct $warehouseOrderProduct)
     {
         //
     }
@@ -112,10 +106,10 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\WarehouseOrderProduct  $warehouseOrderProduct
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, WarehouseOrderProduct $warehouseOrderProduct)
     {
         //
     }
@@ -123,48 +117,33 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\WarehouseOrderProduct  $warehouseOrderProduct
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(WarehouseOrderProduct $warehouseOrderProduct)
     {
         //
     }
 
-    public function useParams($params)
+    public function useParams($invoice)
     {
-        if (empty($params))
-        {
-            $result = [
-                'status' => 'error',
-                'message' => 'params is required.',
-                'result' => [],
-            ];
-            return response()->json($result, Response::HTTP_NOT_FOUND);
+        if (empty($invoice)) {
+            return response()->json(['message' => 'Invoice cant empty'], Response::HTTP_NOT_FOUND);
         }
 
-        $product = Product::select()
-            ->where('name', 'LIKE', '%' . $params . '%')
+        $data = WarehouseOrderProduct::where('invoice', 'like', '%' . $invoice . '%')
             ->get();
 
-        $count = $product->count();
-
-        if ($count == 0) {
-            $result = [
-                'status' => 'error',
-                'message' => sprintf('Product not found with name: %s', $params),
-                'result' => [],
-            ];
-            return response()->json($result, Response::HTTP_NOT_FOUND);
+        $count_data = $data->count();
+        if ($count_data == 0) {
+            return response()->json(['message' => sprintf('orders like %s not found', $invoice)], Response::HTTP_NOT_FOUND);
         }
 
         $result = [
-            'status' => 'success',
-            'message' => sprintf('Product retrieved successfully with name: %s', $params),
-            'count' => $count,
-            'result' => $product,
+            'message' => sprintf('orders like %s', $invoice),
+            'count_result' => $count_data,
+            'result' => $data
         ];
-
         return response()->json($result, Response::HTTP_OK);
     }
 }

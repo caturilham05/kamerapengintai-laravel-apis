@@ -17,39 +17,21 @@ class MarketplaceController extends Controller
      */
     public function index()
     {
-        $marketplace = Marketplace::select(
-            'id',
-            'marketplace',
-            'name',
-            'store_address',
-            'store_number_phone',
-            'discount',
-            'extra_ongkir',
-            'extra_cashback',
-            'payment_fee',
-            'admin_fee',
-            'discount_maximum',
-            'created',
-            'updated',
-        )
-            ->orderBy('id', 'DESC')
-            ->get();
-        $count = $marketplace->count();
-        $result = [
-            'status' => 'success',
-            'message' => 'Marketplace retrieved successfully.',
-            'count' => $count,
-            'result' => $marketplace,
-        ];
-
+        $marketplace = Marketplace::paginate(15);
+        $count = Marketplace::count();
         if ($count == 0) {
             $result = [
                 'status' => 'error',
-                'message' => 'Marketplace not found.',
+                'message' => 'No data found.',
                 'result' => [],
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
+        $result = [
+            'status' => 'success',
+            'message' => 'Marketplace retrieved successfully.',
+            'result' => $marketplace,
+        ];
 
         return response()->json($result, Response::HTTP_OK);
     }

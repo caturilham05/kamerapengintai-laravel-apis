@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WarehouseOrderController;
+use App\Http\Controllers\WarehouseOrderProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,16 +25,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::get('/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/marketplaces', [MarketplaceController::class, 'index']);
     Route::get('/marketplace_detail/{id}', [MarketplaceController::class, 'show']);
     Route::post('/marketplaces', [MarketplaceController::class, 'store']);
+
     Route::get('/orders', [WarehouseOrderController::class, 'index']);
     Route::get('/orders/{invoice?}', [WarehouseOrderController::class, 'show'])->where('invoice', '[\w\s\-_\/]+');
     Route::get('/order_detail/{id}', [WarehouseOrderController::class, 'useId']);
+
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/product_detail/{id}', [ProductController::class, 'show']);
     Route::get('/products/{name?}', [ProductController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
+
+    Route::get('/order_products', [WarehouseOrderProductController::class, 'index']);
+    Route::get('/order_product_detail/{id}', [WarehouseOrderProductController::class, 'show']);
+    Route::get('/order_products/{invoice?}', [WarehouseOrderProductController::class, 'useParams'])->where('invoice', '[\w\s\-_\/]+');
+
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
