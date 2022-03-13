@@ -139,6 +139,11 @@ class WarehouseOrderProductController extends Controller
             return response()->json(['message' => sprintf('orders like %s not found', $invoice)], Response::HTTP_NOT_FOUND);
         }
 
+        if ($count_data > 15) {
+            $data = WarehouseOrderProduct::where('invoice', 'like', '%' . $invoice . '%')
+                ->paginate(15);
+        }
+
         $result = [
             'message' => sprintf('orders like %s', $invoice),
             'count_result' => $count_data,

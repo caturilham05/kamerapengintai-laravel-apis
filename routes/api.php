@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RecipientController;
 use App\Http\Controllers\WarehouseOrderController;
 use App\Http\Controllers\WarehouseOrderProductController;
 use Illuminate\Http\Request;
@@ -43,6 +44,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/order_products', [WarehouseOrderProductController::class, 'index']);
     Route::get('/order_product_detail/{id}', [WarehouseOrderProductController::class, 'show']);
     Route::get('/order_products/{invoice?}', [WarehouseOrderProductController::class, 'useParams'])->where('invoice', '[\w\s\-_\/]+');
+
+    Route::get('/recipients', [RecipientController::class, 'index']);
+    Route::get('/recipient_detail/{id}', [RecipientController::class, 'show']);
+    Route::get('/recipients/{name}', [RecipientController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

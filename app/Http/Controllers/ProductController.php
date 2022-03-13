@@ -158,6 +158,12 @@ class ProductController extends Controller
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
 
+        if ($count > 15){
+            $product = Product::select()
+                ->where('name', 'LIKE', '%' . $params . '%')
+                ->paginate(15);
+        }
+
         $result = [
             'status' => 'success',
             'message' => sprintf('Product retrieved successfully with name: %s', $params),
