@@ -74,7 +74,7 @@ class ProductController extends Controller
 
         $product = Product::select()
             ->where('id', $id)
-            ->get();
+            ->first();
 
         $count = $product->count();
 

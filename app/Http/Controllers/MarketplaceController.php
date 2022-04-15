@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Marketplace;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -179,4 +180,5 @@ class MarketplaceController extends Controller
     {
         //
     }
+
 }
