@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BbcUser;
+use App\Models\TokenUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,12 +11,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\VarDumper;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
+
+        $getUser = BbcUser::where('username', $request->email)->first();
+        if ($getUser) {
+            return response()->json([
+                'message' => 'User already exists'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $validator = Validator::make($request->all(), [
             'group_ids' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -36,8 +44,8 @@ class AuthController extends Controller
             'username' => $user->email,
             'password' => $user->password,
         ]);
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+
+        return response()->json(['data' => $user], 200);
     }
 
     public function login(Request $login)
@@ -48,14 +56,17 @@ class AuthController extends Controller
         $user = User::where('email', $login['email'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer', 'status' => 'success'], 200);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $post_data = $request->all();
-        $user = User::where('email', $post_data['email'])->firstOrFail();
-        $user->tokens()->where('tokenable_id', $user['id'])->delete();
-        return response()->json(['message' => sprintf('%s, logout successfully', $user['name'])], 200);
+        $id = Auth::user();
+        $token = TokenUser::where('tokenable_id', $id->id)->delete();
+        if ($token) {
+            return response()->json(['message' => 'logout successfully'], 200);
+        } else {
+            return response()->json(['message' => 'logout failed'], 400);
+        }
     }
 }

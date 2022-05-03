@@ -28,8 +28,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/home', [HomeController::class, 'index']);
 Route::get('/login', [AuthController::class, 'login'])->name('login');
+
+Route::get('/product_categories', [ProductCategoryController::class, 'index']);
+Route::get('/product_categories_grouping', [ProductCategoryController::class, 'group_category']);
+Route::get('/product_categories/{id}', [ProductCategoryController::class, 'show']);
+
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/product_detail/{id}', [ProductController::class, 'show']);
+Route::get('/products/{name?}', [ProductController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/marketplaces', [MarketplaceController::class, 'index']);
@@ -40,10 +47,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/orders/{invoice?}', [WarehouseOrderController::class, 'show'])->where('invoice', '[\w\s\-_\/]+');
     Route::get('/order_detail/{id}', [WarehouseOrderController::class, 'useId']);
 
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/product_detail/{id}', [ProductController::class, 'show']);
-    Route::get('/products/{name?}', [ProductController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
-
     Route::get('/order_products', [WarehouseOrderProductController::class, 'index']);
     Route::get('/order_product_detail/{id}', [WarehouseOrderProductController::class, 'show']);
     Route::get('/order_products/{invoice?}', [WarehouseOrderProductController::class, 'useParams'])->where('invoice', '[\w\s\-_\/]+');
@@ -51,9 +54,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/recipients', [RecipientController::class, 'index']);
     Route::get('/recipient_detail/{id}', [RecipientController::class, 'show']);
     Route::get('/recipients/{name}', [RecipientController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
-
-    Route::get('/product_categories', [ProductCategoryController::class, 'index']);
-    Route::get('/product_categories/{id}', [ProductCategoryController::class, 'show']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

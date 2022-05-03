@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TokenUser;
+use App\Models\User;
 use App\Models\WarehouseOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -16,6 +19,14 @@ class WarehouseOrderController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+        $cek_token = TokenUser::where('tokenable_id', $user->id)->first();
+        if (empty($cek_token))
+        {
+            return response()->json([
+                'message' => 'Token not found'
+            ], Response::HTTP_BAD_REQUEST);
+        }
         $datas = WarehouseOrder::paginate(15);
         $count = WarehouseOrder::count();
         if ($count == 0) {

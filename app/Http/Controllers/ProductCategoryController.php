@@ -15,7 +15,7 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        $product_cat = ProductCategory::paginate(15);
+        $product_cat = ProductCategory::select()->orderBy('id', 'DESC')->get();
         $count = ProductCategory::count();
 
         if ($count == 0) {
@@ -64,9 +64,9 @@ class ProductCategoryController extends Controller
     public function show($id)
     {
         $product_cat_detail = ProductCategory::select()
-        ->where('id', $id)
-        ->where('publish', 1)
-        ->first();
+            ->where('id', $id)
+            ->where('publish', 1)
+            ->first();
         $count = ProductCategory::count();
         if (empty($product_cat_detail)) {
             $result = [
@@ -116,5 +116,52 @@ class ProductCategoryController extends Controller
     public function destroy(ProductCategory $productCategory)
     {
         //
+    }
+    public function group_category()
+    {
+        $product_cat = ProductCategory::select()->where('par_id', 0)->where('publish', 1)->orderBy('id', 'DESC')->get();
+        $count = count($product_cat);
+        if ($count == 0) {
+            $result = [
+                'status' => 'error',
+                'message' => 'No data found.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        foreach ($product_cat as $key => $value) {
+            $new_product_cat[$value['id']] = $value;
+        }
+
+        $par_id = array_column($product_cat->toArray(), 'id');
+        $par_id = array_unique($par_id);
+        $category_par_id = ProductCategory::select()->whereIn('par_id', $par_id)->orderBy('id', 'DESC')->get();
+        $count_category_par_id = count($category_par_id);
+        if ($count_category_par_id == 0) {
+            $result = [
+                'status' => 'error',
+                'message' => 'No data found.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+
+        foreach ($category_par_id as $key => $value) {
+            $new_category_par_id[$value['par_id']][] = $value;
+        }
+        foreach ($new_product_cat as $key => $value) {
+            $value['grouping_par_id'] = !empty($new_category_par_id[$key]) ? $new_category_par_id[$key] : [];
+            $final_grouping_category[] = $value;
+        }
+        $result = [
+            'status' => 'success',
+            'message' => 'Product Category retrieved successfully.',
+            'count' => $count,
+            'result' => $final_grouping_category,
+        ];
+
+        return response()->json($result, Response::HTTP_OK);
     }
 }
