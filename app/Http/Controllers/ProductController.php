@@ -19,7 +19,7 @@ class ProductController extends Controller
         $count = Product::count();
         if ($count == 0) {
             $result = [
-                'status' => 'error',
+                'count' => $count,
                 'message' => 'No data found.',
                 'result' => [],
             ];
@@ -172,5 +172,42 @@ class ProductController extends Controller
         ];
 
         return response()->json($result, Response::HTTP_OK);
+    }
+
+    public function product_related($id)
+    {
+        if (empty($id))
+        {
+            $result = [
+                'status' => 'error',
+                'message' => 'Product unique is required.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $product = Product::select()
+        ->where('cat_id', $id)
+        ->get();
+
+        $count = $product->count();
+        if ($count == 0) {
+            $result = [
+                'status' => 'error',
+                'message' => 'Product not found.',
+                'result' => [],
+            ];
+            return response()->json($result, Response::HTTP_NOT_FOUND);
+        }
+
+        $result = [
+            'status' => 'success',
+            'message' => 'Product retrieved successfully.',
+            'count' => $count,
+            'result' => $product,
+        ];
+
+        return response()->json($result, Response::HTTP_OK);
+
     }
 }

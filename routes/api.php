@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\ProductCartController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipientController;
@@ -36,6 +37,7 @@ Route::get('/product_categories/{id}', [ProductCategoryController::class, 'show'
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/product_detail/{id}', [ProductController::class, 'show']);
+Route::get('/product_related/{id}', [ProductController::class, 'product_related']);
 Route::get('/products/{name?}', [ProductController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -54,6 +56,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/recipients', [RecipientController::class, 'index']);
     Route::get('/recipient_detail/{id}', [RecipientController::class, 'show']);
     Route::get('/recipients/{name}', [RecipientController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
+
+    Route::get('/product_cart/{user_id}', [ProductCartController::class, 'show']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
