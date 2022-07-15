@@ -9,5 +9,11 @@ class ProductCart extends Model
 {
     use HasFactory;
     protected $table = 'kp_product_cart';
+    protected $fillable = [
+        'user_id',
+        'product_id',
+        'qty',
+        'stock',
+    ];
     public $timestamps = false;
 }

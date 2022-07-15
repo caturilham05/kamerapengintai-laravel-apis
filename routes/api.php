@@ -58,6 +58,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/recipients/{name}', [RecipientController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 
     Route::get('/product_cart/{user_id}', [ProductCartController::class, 'show']);
+    Route::post('/product_cart', [ProductCartController::class, 'create']);
+    Route::post('/product_cart_increment/{id}', [ProductCartController::class, 'update']);
+    Route::post('/product_cart_decrement/{id}', [ProductCartController::class, 'decrementQty']);
+    Route::delete('/product_cart/{id}', [ProductCartController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

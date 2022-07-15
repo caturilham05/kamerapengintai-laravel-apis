@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $product = Product::orderBy('hits', 'desc')->paginate(30);
+        $product = Product::orderBy('qty_available', 'desc')->paginate(30);
         $count = Product::count();
         if ($count == 0) {
             $result = [
