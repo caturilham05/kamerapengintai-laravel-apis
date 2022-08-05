@@ -56,10 +56,10 @@ class ProductCartController extends Controller
             $db_results[] = DB::table('kp_product_cart')->where('user_id', $request->user_id)->where('product_id', $request->product_id)->update($prepareUpdate);
         } else {
             $prepareCrate = [
-                'user_id' => $request->user_id,
+                'user_id'    => $request->user_id,
                 'product_id' => $request->product_id,
-                'qty' => $request->qty,
-                'stock' => $request->stock,
+                'qty'        => $request->qty,
+                'stock'      => $request->stock,
             ];
             $cekProductId = DB::table('warehouse_product')->where('id', $prepareCrate['product_id'])->first();
             if (empty($cekProductId)) {

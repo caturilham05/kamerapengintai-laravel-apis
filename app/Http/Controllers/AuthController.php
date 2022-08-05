@@ -34,13 +34,13 @@ class AuthController extends Controller
             return response()->json($validator->errors());
         }
         $user = User::create([
-            'group_ids' => ',' . $request->group_ids . ',',
+            'group_ids' => $request->group_ids,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
         BbcUser::create([
-            'group_ids' => ',' . $request->group_ids . ',',
+            'group_ids' => $request->group_ids,
             'username' => $user->email,
             'password' => $user->password,
         ]);
