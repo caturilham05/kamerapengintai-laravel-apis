@@ -9,5 +9,11 @@ class Recipient extends Model
 {
     use HasFactory;
     protected $table = 'kp_recipient';
+    protected $fillable = [
+        'owner',
+        'name',
+        'email',
+        'created'
+    ];
     public $timestamps = false;
 }

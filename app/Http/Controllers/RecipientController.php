@@ -59,9 +59,36 @@ class RecipientController extends Controller
      * @param  \App\Models\Recipient  $recipient
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($email)
     {
-        $data = Recipient::find($id);
+        $data = Recipient::select(
+            'id',
+            'name',
+            'owner',
+            'gender',
+            'phone',
+            'email',
+            'address',
+            'date_birth',
+            'order_count',
+            'npwp',
+            'credit_limit',
+            'remaining_credit_limit',
+            'bussiness_type',
+            'tax_type',
+            'location_id',
+            'description',
+            'store_type',
+            'street_width',
+            'store_position',
+            'ktp_image',
+            'store_image',
+            'owner_store_image',
+            'npwp_image',
+            'approved'
+        )
+            ->where('email', $email)
+            ->first();
         if ($data == null) {
             $result = [
                 'status' => 'error',
@@ -70,8 +97,20 @@ class RecipientController extends Controller
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
+        $data->date_birth = $data->date_birth == '0000-00-00' ? null : $data->date_birth;
+        $data->address = empty($data->address) ? null : $data->address;
+        $data->description = empty($data->description) ? null : $data->description;
+        $data->ktp_image = empty($data->ktp_image) ? null : $data->ktp_image;
+        $data->name = empty($data->name) ? null : $data->name;
+        $data->owner = empty($data->owner) ? null : $data->owner;
+        $data->owner_store_image = empty($data->owner_store_image) ? null : $data->owner_store_image;
+        $data->npwp = empty($data->npwp) ? null : $data->npwp;
+        $data->npwp_image = empty($data->npwp_image) ? null : $data->npwp_image;
+        $data->phone = empty($data->phone) ? null : $data->phone;
+        $data->store_image = empty($data->store_image) ? null : $data->store_image;
+
         $response = [
-            'message' => sprintf('recipient name: %s', $data->name),
+            'message' => sprintf('recipient owner: %s', $data->owner),
             'result' => $data
         ];
         return response()->json($response, Response::HTTP_OK);

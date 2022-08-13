@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BbcUser;
+use App\Models\Recipient;
 use App\Models\TokenUser;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -44,7 +45,10 @@ class AuthController extends Controller
             'username' => $user->email,
             'password' => $user->password,
         ]);
-
+        Recipient::create([
+            'owner' => $request->owner,
+            'email' => $request->email,
+        ]);
         return response()->json(['data' => $user], 200);
     }
 

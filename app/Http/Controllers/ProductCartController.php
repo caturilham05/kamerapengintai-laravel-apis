@@ -154,11 +154,6 @@ class ProductCartController extends Controller
         $discount_all = 0;
         $grand_total = 0;
         $total_cart = 0;
-        // $new_data['discount_all'] = 0;
-        // $new_data['total_product'] = 0;
-        // $new_data['grand_total'] = 0;
-        // $new_data['total_cart'] = 0;
-
 
         foreach ($product_cart as $value) {
             $value['title'] = !empty($product_key[$value['product_id']]['title']) ? $product_key[$value['product_id']]['title'] : $product_key[$value['product_id']]['name'];
@@ -181,20 +176,6 @@ class ProductCartController extends Controller
 
             $new_data[] = $value;
         }
-
-        // $new_data['total']['discount_all'] = $discount_all;
-        // $new_data['total']['total_product'] = $grand_total;
-        // $grand_total = floor($grand_total) - floor($discount_all);
-        // $new_data['total']['grand_total'] = $grand_total;
-        // $new_data['total']['total_cart'] = $total_cart;
-
-        // $results = [
-        //     'discount_all' => $discount_all,
-        //     'total_product' => $grand_total,
-        //     'grand_total' => $grand_total,
-        //     'total_cart' => $total_cart,
-        //     'order_products' => $new_data,
-        // ];
 
         $result = [
             'status' => 'success',
@@ -273,71 +254,6 @@ class ProductCartController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Success update cart product'], 200);
         }
     }
-
-    // public function productCartTotal($id)
-    // {
-    //     $product_cart = DB::table('kp_product_cart')->where('user_id', $id)->get();
-    //     if (empty($product_cart)) {
-    //         return response()->json(['message' => 'Product Cart not found'], Response::HTTP_NOT_FOUND);
-    //     }
-
-    //     $product_id = array_column($product_cart->toArray(), 'product_id');
-    //     $product = Product::whereIn('id', $product_id)->get();
-
-    //     if ($product == null) {
-    //         $result = [
-    //             'status' => 'error',
-    //             'message' => 'Product Not Found.',
-    //             'result' => [],
-    //         ];
-    //         return response()->json($result, Response::HTTP_NOT_FOUND);
-    //     }
-
-    //     foreach ($product as $key => $value) {
-    //         $product_key[$value['id']] = $value;
-    //     }
-
-    //     if ($product_key == null) {
-    //         $result = [
-    //             'status' => 'error',
-    //             'message' => 'Product Not Found.',
-    //             'result' => [],
-    //         ];
-    //         return response()->json($result, Response::HTTP_NOT_FOUND);
-    //     }
-
-    //     $discount_all = 0;
-    //     $grand_total = 0;
-    //     $new_data['discount_all'] = 0;
-    //     $new_data['total_product'] = 0;
-    //     $new_data['grand_total'] = 0;
-    //     $total_cart = 0;
-
-    //     foreach ($product_cart as $key => $value) {
-    //         $value->sale = !empty($product_key[$value->product_id]['sale']) ? $product_key[$value->product_id]['sale'] : 0;
-    //         $value->is_ppn = !empty($product_key[$value->product_id]['is_ppn']) ? $product_key[$value->product_id]['is_ppn'] : 0;
-    //         $value->sale = ($value->sale == 1) ? rand(1500000, 1599999) : $value->sale;
-    //         $value->sale_with_ppn = $value->is_ppn == 1 ? $value->sale * 1.11 : $value->sale;
-    //         $value->total_sale = $value->sale_with_ppn * $value->qty;
-    //         $value->discount = rand(5000, 15000);
-    //         $discount_all += $value->discount;
-    //         $grand_total += $value->total_sale;
-    //         $total_cart += $value->qty;
-    //     }
-
-    //     $new_data['discount_all'] = $discount_all;
-    //     $new_data['total_product'] = $grand_total;
-    //     $grand_total = floor($grand_total) - floor($discount_all);
-    //     $new_data['grand_total'] = $grand_total;
-    //     $new_data['total_cart'] = $total_cart;
-
-    //     $result = [
-    //         'status' => 'success',
-    //         'message' => 'Product Cart retrieved successfully.',
-    //         'result' => $new_data,
-    //     ];
-    //     return response()->json($result, Response::HTTP_OK);
-    // }
 
     /**
      * Remove the specified resource from storage.

@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/order_products/{invoice?}', [WarehouseOrderProductController::class, 'useParams'])->where('invoice', '[\w\s\-_\/]+');
 
     Route::get('/recipients', [RecipientController::class, 'index']);
-    Route::get('/recipient_detail/{id}', [RecipientController::class, 'show']);
+    Route::get('/recipient_detail/{id}', [RecipientController::class, 'show'])->where('email', '[\w\s\-_\/]+');
     Route::get('/recipients/{name}', [RecipientController::class, 'useParams'])->where('name', '[\w\s\-_\/]+');
 
     Route::get('/product_cart/{user_id}', [ProductCartController::class, 'show']);
