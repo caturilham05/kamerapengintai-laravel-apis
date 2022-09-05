@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
 use App\Models\Recipient;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -97,6 +98,12 @@ class RecipientController extends Controller
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
+
+        $location = Location::select('id', 'title', 'detail')->where('id', $data->location_id)->first();
+        if ($location == null) {
+            $location = [];
+        }
+
         $data->date_birth = $data->date_birth == '0000-00-00' ? null : $data->date_birth;
         $data->address = empty($data->address) ? null : $data->address;
         $data->description = empty($data->description) ? null : $data->description;
@@ -108,6 +115,7 @@ class RecipientController extends Controller
         $data->npwp_image = empty($data->npwp_image) ? null : $data->npwp_image;
         $data->phone = empty($data->phone) ? null : $data->phone;
         $data->store_image = empty($data->store_image) ? null : $data->store_image;
+        $data->location = $location;
 
         $response = [
             'message' => sprintf('recipient owner: %s', $data->owner),

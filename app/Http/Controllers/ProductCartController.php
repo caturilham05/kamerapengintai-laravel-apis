@@ -116,17 +116,17 @@ class ProductCartController extends Controller
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
 
-        $product_cart = ProductCart::where('user_id', $id)->orderBy('id', 'desc')->get();
-        if ($product_cart == null) {
+        $product_cart = ProductCart::where('user_id', $id)->orderBy('id', 'desc')->get()->toArray();
+        if (!$product_cart) {
             $result = [
                 'status' => 'error',
-                'message' => 'Your Cart is Empty.',
+                'message' => 'Wah, keranjang belanjamu masih kosong.',
                 'result' => [],
             ];
             return response()->json($result, Response::HTTP_NOT_FOUND);
         }
 
-        $product_id = array_column($product_cart->toArray(), 'product_id');
+        $product_id = array_column($product_cart, 'product_id');
         $product = Product::whereIn('id', $product_id)->get();
 
         if ($product == null) {
