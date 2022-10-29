@@ -13,6 +13,8 @@ class Recipient extends Model
         'owner',
         'name',
         'email',
+        'credit_limit',
+        'remaining_credit_limit',
         'created'
     ];
     public $timestamps = false;

@@ -62,7 +62,6 @@ class WarehouseOrderProductController extends Controller
      */
     public function show($id)
     {
-        var_dump($id);die();
         if (empty($id))
         {
             $result = [

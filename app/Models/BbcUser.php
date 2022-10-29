@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BbcUser extends Model
 {
     use HasFactory;
-    protected $table = 'Bbc_user';
+    protected $table = 'bbc_user';
     protected $fillable = [
         'group_ids',
         'username',

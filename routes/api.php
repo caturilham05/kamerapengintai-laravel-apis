@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\ProductCartCheckoutController;
 use App\Http\Controllers\ProductCartController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
@@ -63,6 +64,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/product_cart_increment/{id}', [ProductCartController::class, 'update']);
     Route::post('/product_cart_decrement/{id}', [ProductCartController::class, 'decrementQty']);
     Route::delete('/product_cart/{id}', [ProductCartController::class, 'destroy']);
+
+    Route::get('/product_cart_checkout/{user_id}', [ProductCartCheckoutController::class, 'show']);
+    Route::post('/product_cart_checkout/{id}', [ProductCartCheckoutController::class, 'update']);
+    Route::post('/product_cart_checkout', [ProductCartCheckoutController::class, 'create']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
