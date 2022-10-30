@@ -15,6 +15,7 @@ class Recipient extends Model
         'email',
         'credit_limit',
         'remaining_credit_limit',
+        'order_last_date',
         'created'
     ];
     public $timestamps = false;

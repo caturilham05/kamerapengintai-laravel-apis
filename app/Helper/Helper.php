@@ -67,6 +67,7 @@ class Helper
                 $dt_invoice = implode($delimiter, $invoice_explode_new[Helper::arrayFirst($group_arr)]);
             }
         }
+
         if (empty($dt_invoice)) {
             $last_inv = str_pad('1', 6, '0', STR_PAD_LEFT);
         } else {
@@ -81,10 +82,9 @@ class Helper
                 $invoice_month_exists = WarehouseOrder::select('invoice')->where('invoice', 'like', '%/' . $out_month . '/%')->orderBy('id', 'DESC')->limit(1)->get()->toArray();
                 $last_inv = empty($invoice_month_exists) ? str_pad('1', 6, '0', STR_PAD_LEFT) : $last_inv;
             }
-            $last_inv = (empty($dt_invoice)) ? '000001' : (($last_inv == 1000000) ? '000001' : (($last_inv != 1000000) ? $last_inv : ''));
-            $out      = $code . $date_year . $delimiter . $out_month . $delimiter . $last_inv;
-
-            return $out;
         }
+        $last_inv = (empty($dt_invoice)) ? '000001' : (($last_inv == 1000000) ? '000001' : (($last_inv != 1000000) ? $last_inv : ''));
+        $out      = $code . $date_year . $delimiter . $out_month . $delimiter . $last_inv;
+        return $out;
     }
 }

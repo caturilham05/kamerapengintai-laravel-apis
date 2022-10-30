@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use App\Helper\Helper;
+use App\Models\Courier;
 use App\Models\WarehouseOrder;
+use Illuminate\Support\Facades\DB;
 
 class ProductCartCheckoutController extends Controller
 {
@@ -67,8 +69,87 @@ class ProductCartCheckoutController extends Controller
     {
         $user = auth()->user();
         if ($user->id == 0) return response()->json(['status' => 'error', 'message' => 'unauthorized', 'result' => []], Response::HTTP_UNAUTHORIZED);
-        $invoice_genrate = Helper::invoice('KPI/PJ/', 'WarehouseOrder', true);
 
+        $invoice_generate = Helper::invoice('KPI/PJ/', 'WarehouseOrder', true);
+
+        $create_validator = [
+            'address_id' => 'required|integer',
+            'cart_ids' => 'required|json',
+            'shipping_name' => 'required|string',
+            'payment_id' => 'required|integer'
+        ];
+        $validator = Validator::make($request->all(), $create_validator);
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $recipient = Recipient::select('id', 'owner', 'phone', 'email', 'address')->where('email', 'like', '%' . addslashes($user->email) . '%')->first();
+        if (empty($recipient)) return response()->json(['status' => 'error', 'message' => 'pengguna tidak ditemukan', 'result' => []], RESPONSE::HTTP_NOT_FOUND);
+
+        $cart_ids = json_decode($request->cart_ids);
+        $carts = ProductCart::select('id', 'product_id', 'qty', 'stock')->whereIn('id', $cart_ids)->get()->toArray();
+        if (empty($carts)) return response()->json(['status' => 'error', 'message' => 'barang yang ingin anda beli tidak ditemukan', 'result' => []], RESPONSE::HTTP_NOT_FOUND);
+
+        $product_ids = array_column($carts, 'product_id');
+        $products = Product::select('id', 'name', 'sku', 'price', 'sale', 'type', 'cat_id', 'cat_ids', 'cat_name', 'position_id', 'position_name', 'is_ppn')->whereIn('id', $product_ids)->get()->toArray();
+
+        foreach ($carts as $key => $value) {
+            $cart_product_id[$value['product_id']] = $value;
+        }
+
+        foreach ($products as $key => $value) {
+            $value['qty_order'] = $cart_product_id[$value['id']]['qty'];
+            if ($value['is_ppn'] == 1) {
+                if ($request->use_fp == 1) {
+                    print_r('fp');
+                    $invoice_generate = Helper::invoice('KPI/PJ/', 'WarehouseOrder', true);
+                } else {
+                    print_r('no fp');
+                    $invoice_generate = Helper::invoice('KPI/GG/', 'WarehouseOrder', true);
+                }
+            } else {
+                $invoice_generate = Helper::invoice('KPI/NP/', 'WarehouseOrder', true);
+            }
+            $value['invoice'] = $invoice_generate;
+            $products[$key] = $value;
+        }
+
+
+        return $products;
+
+        $stocks = array_column($carts, 'stock');
+        if (in_array(0, $stocks)) return response()->json(['status' => 'error', 'message' => 'stok barang yang ingin anda beli ada yang kosong, silahkan pilih barang yang lain', 'result' => []], RESPONSE::HTTP_NOT_FOUND);
+
+        $recipient_address = RecipientAddress::select('phone', 'location_name', 'description')->where('id', $request->address_id)->first();
+        if (empty($recipient_address)) return response()->json(['status' => 'error', 'message' => 'alamat tidak ditemukan', 'result' => []], RESPONSE::HTTP_NOT_FOUND);
+
+        $courier = Courier::select('id')->where('name', 'like', '%' . addslashes($request->shipping_name) . '%')->first();
+
+        $prepare_post = [
+            'invoice' => $invoice_generate,
+            'recipient_id' => $recipient->id,
+            'recipient' => $recipient->owner,
+            'recipient_phone' => empty($recipient->phone) ? $recipient_address->phone : $recipient->phone,
+            'recipient_address' => empty($recipient->address) ? $recipient_address->location_name . ' (' . $recipient_address->description . ')' : $recipient->address,
+            'recipient_email' => $recipient->email,
+            'courier_id' => empty($courier) ? 0 : $courier->id,
+            'courier_name' => $request->shipping_name,
+            'date' => date('Y-m-d')
+        ];
+
+        // $order_id = WarehouseOrder::create($prepare_post);
+        $order_id = 58834;
+        if (empty($order_id)) return response()->json(['status' => 'error', 'message' => 'order gagal diproses, silahkan coba lagi', 'result' => []], RESPONSE::HTTP_NOT_ACCEPTABLE);
+        // $order = WarehouseOrder::select()->where('id', $order_id->id)->first();
+        $order = WarehouseOrder::select()->where('id', $order_id)->first();
+        if (empty($order)) return response()->json(['status' => 'error', 'message' => 'order tidak ditemukan', 'result' => []], RESPONSE::HTTP_NOT_FOUND);
+        DB::table('kp_recipient')->where('id', $recipient->id)->update(['order_last_date' => date('Y-m-d H:i:s')]);
+        $prepare_post_order_products = [
+            // 'order_id' => $order_id->id,
+            'order_id' => $order_id,
+            'invoice' => $invoice_generate,
+        ];
+        return [$request->cart_ids, $order];
     }
 
     /**
